@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Desafio Stroop | O Sentido das Palavras</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background: linear-gradient(135deg, #6B5B95 0%, #8B7BA8 100%);
+    min-height: 100vh;
+    color: #2d2d2d;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .app { max-width: 600px; width: 100%; }
+  .tela {
+    background: #ffffff;
+    border-radius: 28px;
+    padding: 40px 28px;
+    box-shadow: 0 20px 60px rgba(107, 91, 149, 0.3);
+    animation: fadeIn 0.5s ease-in-out;
+  }
+  @keyframes fadeIn {
+    from { opacity: 0; transform: translateY(10px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .oculta { display: none !important; }
+  .header { margin-bottom: 32px; text-align: center; }
+  .etapa {
+    display: inline-block;
+    background: linear-gradient(135deg, #F8A9C7 0%, #F4E4A6 100%);
+    color: #6B5B95;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 8px 16px;
+    border-radius: 20px;
+    margin-bottom: 16px;
+    letter-spacing: 0.5px;
+  }
+  h1 {
+    font-size: 32px;
+    color: #6B5B95;
+    margin-bottom: 8px;
+    font-weight: 800;
+    letter-spacing: -0.5px;
+  }
+  h2 {
+    font-size: 26px;
+    color: #6B5B95;
+    margin-bottom: 24px;
+    font-weight: 700;
+  }
+  .subtitulo {
+    color: #8B7BA8;
+    font-size: 16px;
+    line-height: 1.5;
+  }
+  p {
+    line-height: 1.7;
+    margin-bottom: 16px;
+    font-size: 15px;
+    color: #4a4a4a;
+  }
+  .cartao {
+    background: linear-gradient(135deg, #f8f7ff 0%, #fff5f8 100%);
+    border-left: 5px solid #F8A9C7;
+    border-radius: 16px;
+    padding: 20px;
+    margin-bottom: 16px;
+    transition: transform 0.3s, box-shadow 0.3s;
+  }
+  .cartao:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 24px rgba(248, 169, 199, 0.15);
+  }
+  .cartao strong { color: #6B5B95; }
+  .cartao p { margin-bottom: 0; }
+  ul.regras {
+    list-style: none;
+    margin-bottom: 24px;
+  }
+  ul.regras li {
+    background: linear-gradient(135deg, #f8f7ff 0%, #fff5f8 100%);
+    border-left: 4px solid #F8A9C7;
+    border-radius: 14px;
+    padding: 16px 18px;
+    margin-bottom: 12px;
+    line-height: 1.6;
+    font-size: 15px;
+    transition: all 0.3s;
+  }
+  ul.regras li:hover {
+    background: linear-gradient(135deg, #f0e9ff 0%, #ffeef5 100%);
+    transform: translateX(4px);
+  }
+  .exemplo {
+    background: linear-gradient(135deg, #6B5B95 0%, #8B7BA8 100%);
+    border-radius: 20px;
+    padding: 28px;
+    text-align: center;
+    margin-bottom: 24px;
+    color: #ffffff;
+  }
+  .exemplo p {
+    color: #f0f0f0;
+    margin-bottom: 16px;
+  }
+  .palavra-exemplo {
+    font-size: 48px;
+    font-weight: 900;
+    color: #F8A9C7;
+    margin: 12px 0;
+    letter-spacing: 3px;
+  }
+  .exemplo strong { color: #F4E4A6; }
+  .botao {
+    display: block;
+    width: 100%;
+    background: linear-gradient(135deg, #F8A9C7 0%, #F08BA1 100%);
+    color: #ffffff;
+    border: none;
+    border-radius: 16px;
+    padding: 16px 20px;
+    font-size: 16px;
+    font-weight: 700;
+    cursor: pointer;
+    margin-top: 12px;
+    transition: all 0.3s;
+    box-shadow: 0 8px 20px rgba(248, 169, 199, 0.3);
+  }
+  .botao:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 30px rgba(248, 169, 199, 0.4);
+  }
+  .botao:active { transform: translateY(0px); }
+  .botao.secundario {
+    background: linear-gradient(135deg, #e8e8f0 0%, #f5f5f8 100%);
+    color: #6B5B95;
+    box-shadow: 0 4px 12px rgba(107, 91, 149, 0.1);
+  }
+  .botao.secundario:hover {
+    background: linear-gradient(135deg, #dcdce8 0%, #ececf0 100%);
+  }
+  .topo-jogo {
+    display: flex;
+    justify-content: space-between;
+    font-weight: 700;
+    color: #6B5B95;
+    margin-bottom: 16px;
+    font-size: 14px;
+  }
+  .barra-container { margin-bottom: 24px; }
+  .barra {
+    background: #e8e8f0;
+    border-radius: 20px;
+    height: 8px;
+    overflow: hidden;
+    margin-top: 8px;
+  }
+  .barra-preenchida {
+    background: linear-gradient(90deg, #F8A9C7 0%, #F4E4A6 100%);
+    height: 100%;
+    width: 0%;
+    transition: width 0.4s ease;
+  }
+  .instrucao {
+    text-align: center;
+    color: #8B7BA8;
+    margin-bottom: 20px;
+    font-size: 14px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  .palco {
+    background: linear-gradient(135deg, #6B5B95 0%, #8B7BA8 100%);
+    border-radius: 24px;
+    min-height: 180px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 28px;
+    box-shadow: 0 12px 40px rgba(107, 91, 149, 0.25);
+  }
+  #palavra {
+    font-size: 56px;
+    font-weight: 900;
+    letter-spacing: 4px;
+    text-transform: uppercase;
+  }
+  #feedback {
+    text-align: center;
+    font-weight: 700;
+    min-height: 28px;
+    margin-bottom: 16px;
+    font-size: 16px;
+    transition: all 0.3s;
+  }
+  .certo { color: #22c55e; animation: pulse 0.5s; }
+  .errado { color: #ef4444; animation: shake 0.4s; }
+  @keyframes pulse {
+    0%, 100% { transform: scale(1); }
+    50% { transform: scale(1.1); }
+  }
+  @keyframes shake {
+    0%, 100% { transform: translateX(0); }
+    25% { transform: translateX(-4px); }
+    75% { transform: translateX(4px); }
+  }
+  .opcoes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+  }
+  .opcao {
+    border: none;
+    border-radius: 16px;
+    padding: 20px 12px;
+    font-size: 14px;
+    font-weight: 700;
+    color: #ffffff;
+    cursor: pointer;
+    transition: all 0.3s;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .opcao:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(0, 0, 0, 0.2);
+  }
+  .opcao:active { transform: translateY(-1px); }
+  .placar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 28px;
+  }
+  .placar div {
+    background: linear-gradient(135deg, #f8f7ff 0%, #fff5f8 100%);
+    border-radius: 18px;
+    padding: 24px;
+    text-align: center;
+    border: 2px solid #F8A9C7;
+    transition: all 0.3s;
+  }
+  .placar div:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 12px 30px rgba(248, 169, 199, 0.2);
+  }
+  .placar .numero {
+    font-size: 32px;
+    font-weight: 900;
+    color: #6B5B95;
+    display: block;
+    margin-bottom: 6px;
+  }
+  .placar .rotulo {
+    font-size: 13px;
+    color: #8B7BA8;
+    font-weight: 600;
+  }
+  .comparacao {
+    margin-bottom: 28px;
+    background: linear-gradient(135deg, #f8f7ff 0%, #fff5f8 100%);
+    padding: 24px;
+    border-radius: 18px;
+  }
+  .linha-tempo {
+    margin-bottom: 20px;
+  }
+  .linha-tempo:last-child { margin-bottom: 0; }
+  .linha-tempo span {
+    font-size: 14px;
+    font-weight: 700;
+    color: #6B5B95;
+    display: block;
+    margin-bottom: 8px;
+  }
+  .trilho {
+    background: #e8e8f0;
+    border-radius: 20px;
+    height: 12px;
+    overflow: hidden;
+  }
+  .trilho div {
+    height: 100%;
+    border-radius: 20px;
+    width: 0%;
+    transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+  }
+  #barra-igual { background: linear-gradient(90deg, #22c55e 0%, #86efac 100%); }
+  #barra-diferente { background: linear-gradient(90deg, #F8A9C7 0%, #F4E4A6 100%); }
+  #mensagem-resultado {
+    font-weight: 600;
+    color: #4a4a4a;
+    line-height: 1.7;
+    margin-bottom: 24px;
+    padding: 16px;
+    background: #f9f9fc;
+    border-left: 4px solid #F8A9C7;
+    border-radius: 12px;
+  }
+  @media (max-width: 480px) {
+    .tela { padding: 28px 20px; }
+    h1 { font-size: 26px; }
+    h2 { font-size: 22px; }
+    #palavra { font-size: 42px; }
+    .palco { min-height: 140px; }
+  }
+</style>
+</head>
+<body>
+<main class="app">
+  <section id="tela-aprender" class="tela">
+    <div class="header">
+      <span class="etapa">Etapa 1 de 4 · Aprender</span>
+      <h1>O SENTIDO DAS PALAVRAS</h1>
+      <p class="subtitulo">Como o cérebro lê, mesmo quando você não quer</p>
+    </div>
+    <div class="cartao">
+      <p><strong>🧠 Ler é automático.</strong> Depois que aprendemos a ler, o cérebro reconhece palavras em uma fração de segundo, sem esforço e sem pedir permissão.</p>
+    </div>
+    <div class="cartao">
+      <p><strong>👁️ Dos olhos ao significado.</strong> A imagem da palavra chega ao córtex visual, é reconhecida como palavra em uma região do lobo temporal esquerdo e segue para as áreas de linguagem, que ativam o seu significado.</p>
+    </div>
+    <div class="cartao">
+      <p><strong>⚡ E quando há conflito?</strong> Se a palavra diz uma coisa e a tarefa pede outra, o cérebro precisa frear a leitura automática. É isso que você vai sentir no jogo.</p>
+    </div>
+    <button class="botao" onclick="mostrarTela('tela-regras')">Continuar</button>
+  </section>
+
+  <section id="tela-regras" class="tela oculta">
+    <div class="header">
+      <span class="etapa">Etapa 2 de 4 · Regras</span>
+      <h2>Como jogar</h2>
+    </div>
+    <ul class="regras">
+      <li><strong>1️⃣</strong> Vai aparecer o nome de uma cor escrito com uma tinta colorida.</li>
+      <li><strong>2️⃣</strong> Toque no botão da <strong>cor da tinta</strong>, e não na palavra que está escrita.</li>
+      <li><strong>3️⃣</strong> Responda o mais rápido que conseguir. São 8 rodadas.</li>
+    </ul>
+    <div class="exemplo">
+      <p style="margin-bottom: 8px; font-size: 14px;">Exemplo:</p>
+      <div class="palavra-exemplo">AZUL</div>
+      <p>A resposta certa é <strong>VERMELHO</strong>, porque essa é a cor da tinta.</p>
+    </div>
+    <button class="botao" onclick="iniciarJogo()">▶️ Jogar</button>
+    <button class="botao secundario" onclick="mostrarTela('tela-aprender')">Voltar</button>
+  </section>
+
+  <section id="tela-jogo" class="tela oculta">
+    <span class="etapa">Etapa 3 de 4 · Jogar</span>
+    <div class="topo-jogo">
+      <span id="contador">Rodada 1 de 8</span>
+      <span id="pontos">Acertos: 0</span>
+    </div>
+    <div class="barra-container">
+      <div class="barra"><div class="barra-preenchida" id="progresso"></div></div>
+    </div>
+    <p class="instrucao">Qual é a cor da TINTA?</p>
+    <div class="palco"><span id="palavra"></span></div>
+    <div id="feedback"></div>
+    <div class="opcoes">
+      <button class="opcao" style="background: linear-gradient(135deg, #ef4444 0%, #dc2626 100%);" onclick="responder(0)">VERMELHO</button>
+      <button class="opcao" style="background: linear-gradient(135deg, #3b82f6 0%, #1d4ed8 100%);" onclick="responder(1)">AZUL</button>
+      <button class="opcao" style="background: linear-gradient(135deg, #22c55e 0%, #15803d 100%);" onclick="responder(2)">VERDE</button>
+      <button class="opcao" style="background: linear-gradient(135deg, #facc15 0%, #eab308 100%); color: #6B5B95;" onclick="responder(3)">AMARELO</button>
+    </div>
+  </section>
+
+  <section id="tela-resultado" class="tela oculta">
+    <div class="header">
+      <span class="etapa">Etapa 4 de 4 · Descobrir</span>
+      <h2>O que aconteceu no seu cérebro</h2>
+    </div>
+    <div class="placar">
+      <div><span class="numero" id="res-acertos">0</span><span class="rotulo">acertos em 8</span></div>
+      <div><span class="numero" id="res-diferenca">0 ms</span><span class="rotulo">diferença de tempo</span></div>
+    </div>
+    <div class="comparacao">
+      <div class="linha-tempo">
+        <span>Palavra e tinta iguais: <span id="tempo-igual">0</span> ms
